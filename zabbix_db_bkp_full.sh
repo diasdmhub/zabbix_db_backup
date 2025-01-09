@@ -1,78 +1,119 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ZABBIX DATABASE FULL BACKUP
-# SYNTAX: ./zabbix_db_bkp_full.sh "[dbhost]" "[dbuser]" "[dbpass]" "[dbname]"
-# PS: THE SCRIPT MIGHT FAIL IF ANY PARAMETER IS OUT OF ORDER
-# by diasdm
+# Author: diasdm
+# This script creates a full backup of the Zabbix database using mysqldump, 
+# compresses it with gzip, and logs the process.
+
+# REQUIREMENTS:
+#     - mysqldump
+#     - gzip
+
+# USAGE:
+#     To use a pre-set Zabbix DB authentication,
+#     set values below (#002.001) and pass the "-d" argument.
+#         ./zabbix_db_bkp_full.sh -d
+
+#     To use your Zabbix DB authentication with arguments,
+#     pass all arguments in the order below.
+#         ./zabbix_db_bkp_full.sh "[dbhost]" "[dbname]" "[dbuser]" "[dbpass]"
+#     PS: THE DUMP MAY FAIL IF ANY ARGUMENT IS OUT OF ORDER
 
 
-#001 VAR
-        bkpdir=${HOME}/zabbix_db_bkp   # BACKUP LOCAL DIR
-        bkplog=${bkpdir}/log           # BACKUP LOG DIR
-        bkpname=zabbix_db_bkp_full     # BACKUP FILE NAME
-        bkpdays=30                     # NUMBER OF DAYS TO KEEP BACKUP
-
-        TIME=$(date +%Y%m%d%H%M%S)     # BACKUP FILE TIMESTAMP
-
-        [[ -z "$1" ]] && dbhost="localhost" || dbhost="$1"       # DEFAULT DB HOSTNAME/IP
-        [[ -z "$2" ]] && dbuser="zabbix" || dbuser="$2"          # DEFAULT DB USERNAME
-        [[ -z "$3" ]] && dbpass="zabbix" || dbpass="$3"          # DEFAULT DB USERNAME'S PASSWORD
-        [[ -z "$4" ]] && dbname="zabbix" || dbname="$4"          # DEFAULT DB NAME
+#001 REQUIREMENTS CHECK
+if ! which mysqldump > /dev/null; then
+    echo "Error: mysqldump binary was not found."
+    exit 1
+elif ! which gzip > /dev/null; then
+    echo "Error: gzip binary was not found."
+    exit 1
+fi
 
 
-#002 LOG LEVEL
+#002 VAR
+bkpdir=${HOME}/zabbix_db_bkp   # BACKUP LOCAL DIR
+bkplogdir=${bkpdir}/log        # BACKUP LOG DIR
+bkpname=zabbix_db_bkp_full     # BACKUP FILE NAME
+bkpdays=30                     # NUMBER OF DAYS TO KEEP OLD BACKUP
+
+TIME=$(date +%Y%m%d%H%M%S)     # BACKUP FILE TIMESTAMP
+
+#002.001 VAR TEST
+if [[ "$*" = "-d" ]]; then
+    dbhost="localhost"         # SET HERE YOUR DEFAULT DB HOSTNAME
+    dbname="zabbix"            # SET HERE YOUR DEFAULT DB NAME
+    dbuser="zabbix"            # SET HERE YOUR DEFAULT DB USERNAME
+    dbpass="zabbix"            # SET HERE YOUR DEFAULT DB USERNAME'S PASSWORD
+else
+    if [[ -z "$1" ]]; then echo -e "\nDB HOST MISSING - ARG 1\n"; exit 2; fi
+    dbhost="$1"
+    if [[ -z "$2" ]]; then echo -e "\nDB NAME MISSING - ARG 2\n"; exit 2; fi
+    dbname="$2"
+    if [[ -z "$3" ]]; then echo -e "\nDB USER MISSING - ARG 3\n"; exit 2; fi
+    dbuser="$3"
+    if [[ -z "$4" ]]; then echo -e "\nDB PASSWORD MISSING - ARG 4\n"; exit 2; fi
+    dbpass="$4"
+fi
+
+
+#003 LOG WRITE
+# Logs messages to both console and log file.
+# Arguments: $1 - The message to log
 function log_write {
-        logtime=$(date +%Y%m%d%H%M%S)
-        echo "${logtime} >> $1" >> ${bkplog}/${bkpname}.log
+    local logtime=$(date +%Y%m%d%H%M%S)
+    echo "${logtime} >> $1"
+    echo "${logtime} >> $1" >> ${bkplogdir}/${bkpname}.log
 }
 
 
-#003 BACKUP DIR CREATION
-[ ! -d ${bkpdir} ] && mkdir -v ${bkpdir}
-[ ! -d ${bkplog} ] && mkdir -v ${bkplog}
+#004 BACKUP DIR CREATION
+[[ ! -d "${bkpdir}" ]] && mkdir -v "${bkpdir}"
+[[ ! -d "${bkplog}" ]] && mkdir -v "${bkplog}"
 
 
-#004 OPTIONAL MESSAGES
-        clear
+#005 LOG START MESSAGE
+clear
+echo ""
 
-        STARTTIME=$(date +%s)
+STARTTIME=$(date +%s)
 
-        echo -e "Backing up config, events, trigger, history etc.\n"
-
-        log_write "------------------------------------------------"
-        log_write "START"
-
-
-#005 MYSQL FULL DUMP
-        log_write "Dumping DB config, events, trigger, history etc."
-
-mysqldump -h${dbhost} -u${dbuser} -p${dbpass} \
-        --flush-logs \
-        --single-transaction \
-        --create-options \
-        ${dbname} | gzip > ${bkpdir}/${TIME}_${bkpname}.sql.gz
-
-        log_write "DB dump complete"
-
-        BKPBYTES=$(stat --printf="%s" ${bkpdir}/${TIME}_${bkpname}.sql.gz)
-        BKPMEGAS=$(( $BKPBYTES / 1024 ** 2 ))
-
-        log_write "Backup file size: ${BKPBYTES}B - ${BKPMEGAS}MB"
+log_write "------------------------------------------------"
+log_write "START"
 
 
-#006 CLEAN UP OLD BACKUP
-        log_write "Excluding old backup with more than ${bkpdays} days"
+#006 MYSQL FULL DUMP
+log_write "Dumping ${dbname} database"
 
-        find ${bkpdir}/* -mtime +${bkpdays} -exec rm -f {} \;
+if mysqldump -h"${dbhost}" -u"${dbuser}" -p"${dbpass}" \
+    --flush-logs \
+    --single-transaction \
+    --create-options \
+    "${dbname}" | gzip > "${bkpdir}/${TIME}_${bkpname}.sql.gz";then
+
+    log_write "DB dump complete"
+else
+    log_write "## DB dump failed ##"
+    exit 4
+fi
 
 
-#007 LOG BACKUP TIME TAKEN
-        ENDTIME=$(date +%s)
+#007 CLEAN UP OLD BACKUP
+log_write "Excluding old backup with more than ${bkpdays} days"
 
-        TOTALTIME=$(( $ENDTIME - $STARTTIME ))
-        TOTALTIME=$(date -d@"$TOTALTIME" -u +%Hh%Mm%Ss)
+find "${bkpdir}"/* -mtime +${bkpdays} -exec rm -f {} +
 
-        log_write "$TOTALTIME - Backup total time"
 
-        log_write "FINISH"
-exit
+#008 LOG BACKUP TIME TAKEN AND FILE SIZE
+BKPBYTES=$(stat --printf="%s" ${bkpdir}/${TIME}_${bkpname}.sql.gz)
+BKPMEGAS=$(( BKPBYTES / 1024 ** 2 ))
+
+ENDTIME=$(date +%s)
+TOTALSEC=$(( ENDTIME - STARTTIME ))
+TOTALTIME=$(date -d@"$TOTALSEC" -u +%Hh%Mm%Ss)
+
+log_write "Backup file size: ${BKPBYTES}B - ${BKPMEGAS}MB"
+log_write "Backup total time: ${TOTALSEC}s - $TOTALTIME"
+log_write "Backup stats: {\"size\":${BKPBYTES},\"time\":${TOTALSEC}}"
+
+log_write "FINISH"
+exit 0
