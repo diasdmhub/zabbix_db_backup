@@ -14,7 +14,7 @@
 #     set values below (#002.001) and pass the "-d" argument.
 #         ./zabbix_db_bkp_full.sh -d
 
-#     To use your Zabbix DB authentication with arguments,
+#     To use your Zabbix DB authentication as arguments,
 #     pass all arguments in the order below.
 #         ./zabbix_db_bkp_full.sh "[dbhost]" "[dbname]" "[dbuser]" "[dbpass]"
 #     PS: THE DUMP MAY FAIL IF ANY ARGUMENT IS OUT OF ORDER
@@ -58,17 +58,17 @@ fi
 
 #003 LOG WRITE
 # Logs messages to both console and log file.
-# Arguments: $1 - The message to log
 function log_write {
-    local logtime=$(date +%Y%m%d%H%M%S)
+    local logtime
+    logtime=$(date +%Y%m%d%H%M%S)
     echo "${logtime} >> $1"
-    echo "${logtime} >> $1" >> ${bkplogdir}/${bkpname}.log
+    echo "${logtime} >> $1" >> "${bkplogdir}/${bkpname}.log"
 }
 
 
 #004 BACKUP DIR CREATION
 [[ ! -d "${bkpdir}" ]] && mkdir -v "${bkpdir}"
-[[ ! -d "${bkplog}" ]] && mkdir -v "${bkplog}"
+[[ ! -d "${bkplogdir}" ]] && mkdir -v "${bkplogdir}"
 
 
 #005 LOG START MESSAGE
@@ -98,13 +98,14 @@ fi
 
 
 #007 CLEAN UP OLD BACKUP
+# Stats may be pulled from Zabbix
 log_write "Excluding old backup with more than ${bkpdays} days"
 
 find "${bkpdir}"/* -mtime +${bkpdays} -exec rm -f {} +
 
 
 #008 LOG BACKUP TIME TAKEN AND FILE SIZE
-BKPBYTES=$(stat --printf="%s" ${bkpdir}/${TIME}_${bkpname}.sql.gz)
+BKPBYTES=$(stat --printf="%s" "${bkpdir}/${TIME}_${bkpname}.sql.gz")
 BKPMEGAS=$(( BKPBYTES / 1024 ** 2 ))
 
 ENDTIME=$(date +%s)
