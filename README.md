@@ -14,7 +14,7 @@ This is a script that creates a full backup of the Zabbix database. It is useful
 
 The script uses `mysqldump` to produce a set of SQL statements from the Zabbix MySQL database for backup purposes. It also reduces the size of the database dump by compressing it with `gzip`. During this process, the script records the execution to a log file and writes some statistics.
 
-The template is ready to read the script log statistics with a Zabbix Agent in active mode, and report if the backup has failed.
+The template is ready to read the script log statistics with a Zabbix Agent in active mode, and alert if the backup has failed.
 
 ![Widget Sample](./image/widget_sample.png)
 
