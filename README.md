@@ -62,15 +62,15 @@ chmod +x zabbix_db_bkp_full.sh
 #### Log Sample
 
 ```
-20250109040001 >> ------------------------------------------------
-20250109040001 >> START
-20250109040001 >> Dumping zabbix database
-20250109040418 >> DB dump complete
-20250109040418 >> Excluding old backup with more than 30 days
-20250109040418 >> Backup file size: 389898753B - 371MB
-20250109040418 >> Backup total time: 257s - 00h04m17s
-20250109040418 >> Backup stats: {"size":389898753,"time":257}
-20250109040418 >> FINISH
+20250109210805 >> ------------------------------------------------
+20250109210805 >> START
+20250109210805 >> Dumping "zabbix" database
+20250109211139 >> DB dump complete. File "/home/user/zabbix_db_bkp/20250109210805_zabbix_db_bkp_full.sql.gz"
+20250109211139 >> Excluding old backup with more than 30 days
+20250109211139 >> Backup file size: 342638746B - 326MB
+20250109211139 >> Backup total time: 214s - 00h03m34s
+20250109211139 >> Backup stats: {"dump_status":0,"size":342638746,"time":214}
+20250109211139 >> FINISH
 ```
 
 <BR>
@@ -85,7 +85,7 @@ chmod +x zabbix_db_bkp_full.sh
 
 <BR>
 
-## MACROS USED
+## MACROS
 
 | Macro                  | Default Value          | Description |
 | :--------------------- | :--------------------: | :---------- |
