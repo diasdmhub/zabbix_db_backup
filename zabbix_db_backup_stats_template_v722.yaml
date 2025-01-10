@@ -1,8 +1,8 @@
 zabbix_export:
   version: '7.2'
   template_groups:
-    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
-      name: Templates/Applications
+    - uuid: 748ad4d098d447d492bb935c907f652f
+      name: Templates/Databases
   templates:
     - uuid: acfb2b40b9594ce39f5d155b2d21eb33
       template: 'Zabbix DB Backup Stats by Zabbix Agent Active'
@@ -16,14 +16,14 @@ zabbix_export:
         name: diasdm
         version: 7.2-2
       groups:
-        - name: Templates/Applications
+        - name: Templates/Databases
       items:
         - uuid: c04a33c13ec2447e997aaba48e09a1f8
           name: 'DB Backup Log Stats'
           type: ZABBIX_ACTIVE
           key: 'logrt["{$ZABBIX.BKP.LOG.DIR}{$ZABBIX.BKP.LOG.NAME}",">> Backup stats: (.*)",,,skip,"\1"]'
           delay: 1h
-          history: 2d
+          history: '0'
           value_type: LOG
           description: 'Master item that pull the DB backup log messages'
           logtimefmt: yyyyMMddhhmmss
@@ -31,13 +31,13 @@ zabbix_export:
             - tag: Log
               value: db_backup
         - uuid: cf93c28e68094651b2b9c8863ac7aac1
-          name: 'DB Backup Dump Status'
+          name: 'DB Backup Dump State'
           type: DEPENDENT
-          key: 'zabbix.db.backup[dump.status]'
+          key: 'zabbix.db.backup.dump[state]'
           history: 7d
           trends: '0'
           description: |
-            DB backup dump status
+            DB backup dump state
             0 - Ok
             1 - Failed
           valuemap:
@@ -45,7 +45,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.dump_status
+                - $.dump_state
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1d
@@ -56,12 +56,10 @@ zabbix_export:
               value: status
           triggers:
             - uuid: 455b83aeef3f451592786e2c859ec110
-              expression: 'last(/Zabbix DB Backup Stats by Zabbix Agent Active/zabbix.db.backup[dump.status])=1'
+              expression: 'last(/Zabbix DB Backup Stats by Zabbix Agent Active/zabbix.db.backup.dump[state])=1'
               name: 'Zabbix DB Backup Failed'
               priority: WARNING
-              description: |
-                The last Zabbix DB backup has failed
-                Check the script log
+              description: 'The last Zabbix DB backup has failed'
               tags:
                 - tag: Status
                   value: failed

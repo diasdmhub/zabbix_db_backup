@@ -10,9 +10,13 @@
 
 ## OVERVIEW
 
-This script creates a full backup of the Zabbix database. It is useful to automate Zabbix DB backups with a _crontab_ or some other tool like Zabbix itself.
+This is a script that creates a full backup of the Zabbix database. It is useful to automate Zabbix DB backups with a _crontab_ or some other tool like Zabbix itself. Along with it, a useful template that pull this script data into Zabbix.
 
-It uses `mysqldump` to produce a set of SQL statements from the Zabbix MySQL database for backup purposes. It also reduces the size of the database dump by compressing it with `gzip`. During this process, the script records the execution to a log file and writes some statistics.
+The script uses `mysqldump` to produce a set of SQL statements from the Zabbix MySQL database for backup purposes. It also reduces the size of the database dump by compressing it with `gzip`. During this process, the script records the execution to a log file and writes some statistics.
+
+The template is ready to read the script statistics log and report if the backup has failed.
+
+![Widget Sample](./image/widget_sample.png)
 
 <BR>
 
@@ -20,6 +24,10 @@ It uses `mysqldump` to produce a set of SQL statements from the Zabbix MySQL dat
 
 - [`mysqldump`](https://dev.mysql.com/doc/refman/9.0/en/mysqldump.html)
 - [`gzip`](https://www.gnu.org/software/gzip/)
+- A [backup user](https://www.zabbix.com/documentation/current/en/manual/appendix/install/db_scripts) for Zabbix database
+
+> - **If required, add the `RELOAD` and `PROCESS` database privileges to the backup user. For example:**
+> _`GRANT RELOAD, PROCESS ON . TO 'backup_user'@'localhost'; FLUSH PRIVILEGES;`_
 
 <BR>
 
@@ -43,7 +51,7 @@ chmod +x zabbix_db_bkp_full.sh
 
 **2.2** **[`OPTION 2`]** To use your Zabbix DB authentication as arguments, pass all arguments in the order below. Note that the dump may fail if any argument is out of order.
 
-> ⚠️ **For this option, it is recommended to secure the authentication password in the operation system (e.g. _environment variables_).**
+> ⚠️ **For this option, it is recommended to secure the authentication password in the operating system (e.g. _environment variables_).**
 
 ```
 ./zabbix_db_bkp_full.sh "[dbhost]" "[dbname]" "[dbuser]" "[dbpass]"
@@ -62,15 +70,16 @@ chmod +x zabbix_db_bkp_full.sh
 #### Log Sample
 
 ```
-20250109210805 >> ------------------------------------------------
-20250109210805 >> START
-20250109210805 >> Dumping "zabbix" database
-20250109211139 >> DB dump complete. File "/home/user/zabbix_db_bkp/20250109210805_zabbix_db_bkp_full.sql.gz"
-20250109211139 >> Excluding old backup with more than 30 days
-20250109211139 >> Backup file size: 342638746B - 326MB
-20250109211139 >> Backup total time: 214s - 00h03m34s
-20250109211139 >> Backup stats: {"dump_status":0,"size":342638746,"time":214}
-20250109211139 >> FINISH
+20250110173529 >> ------------------------------------------------
+20250110173529 >> START
+20250110173529 >> Dumping "zabbix" database
+20250110173857 >> DB dump complete
+20250110173857 >> Backup file: "/home/dan/zabbix_db_bkp/20250110173529_zabbix_db_bkp_full.sql.gz"
+20250110173857 >> Excluding old backup with more than 30 days
+20250110173857 >> Backup file size: 322082821B - 307MB
+20250110173857 >> Backup total time: 208s - 00h03m28s
+20250110173857 >> Backup stats: {"dump_state":0,"size":322082821,"time":208}
+20250110173857 >> FINISH
 ```
 
 <BR>
@@ -96,12 +105,12 @@ chmod +x zabbix_db_bkp_full.sh
 
 ## ITEMS
 
-| Name                                       | Description |
-| :----------------------------------------- | :---------- |
-| DB Backup Log Stats                        | Master item that pull the DB backup log messages |
-| DB Backup Log Stats: DB Backup Dump Status | DB backup dump status |
-| DB Backup Log Stats: DB Backup Size        | DB backup file size in Bytes |
-| DB Backup Log Stats: DB Backup Time        | DB backup execution time in seconds |
+| Name                                      | Description |
+| :---------------------------------------- | :---------- |
+| DB Backup Log Stats                       | Master item that pull the DB backup log messages |
+| DB Backup Log Stats: DB Backup Dump State | DB backup dump state |
+| DB Backup Log Stats: DB Backup Size       | DB backup file size in Bytes |
+| DB Backup Log Stats: DB Backup Time       | DB backup execution time in seconds |
 
 <BR>
 

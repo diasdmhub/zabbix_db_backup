@@ -2,7 +2,7 @@
 
 # ZABBIX DATABASE FULL BACKUP
 # Author: diasdm
-# This script creates a full backup of the Zabbix database using mysqldump, 
+# This script creates a full backup of the Zabbix database using mysqldump,
 # compresses it with gzip, and logs the process.
 
 # REQUIREMENTS:
@@ -84,18 +84,19 @@ log_write "START"
 #006 MYSQL FULL DUMP
 log_write "Dumping \"${dbname}\" database"
 
-if mysqldump -h"${dbhost}" -u"${dbuser}" -p"${dbpass}" \
+mysqldump -h"${dbhost}" -u"${dbuser}" -p"${dbpass}" \
     --flush-logs \
     --single-transaction \
     --create-options \
-    "${dbname}" | gzip > "${bkpdir}/${TIME}_${bkpname}.sql.gz";then
+    "${dbname}" | gzip > "${bkpdir}/${TIME}_${bkpname}.sql.gz"
 
-    DUMPSTATUS=0
-    log_write "DB dump complete. File \"${bkpdir}/${TIME}_${bkpname}.sql.gz\""
+if [[ "${PIPESTATUS[0]}" -eq 0 ]]; then
+    DUMPSTATE=0
+    log_write "DB dump complete"
+    log_write "Backup file: \"${bkpdir}/${TIME}_${bkpname}.sql.gz\""
 else
-    DUMPSTATUS=1
-    log_write "## DB dump failed ##"
-    exit 5
+    DUMPSTATE=1
+    log_write '## DB dump failed ##'
 fi
 
 
@@ -116,7 +117,7 @@ TOTALTIME=$(date -d@"$TOTALSEC" -u +%Hh%Mm%Ss)
 
 log_write "Backup file size: ${BKPBYTES}B - ${BKPMEGAS}MB"
 log_write "Backup total time: ${TOTALSEC}s - $TOTALTIME"
-log_write "Backup stats: {\"dump_status\":${DUMPSTATUS},\"size\":${BKPBYTES},\"time\":${TOTALSEC}}"
+log_write "Backup stats: {\"dump_state\":${DUMPSTATE},\"size\":${BKPBYTES},\"time\":${TOTALSEC}}"
 
 log_write "FINISH"
 exit 0
