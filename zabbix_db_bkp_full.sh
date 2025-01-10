@@ -82,7 +82,7 @@ log_write "START"
 
 
 #006 MYSQL FULL DUMP
-log_write "Dumping ${dbname} database"
+log_write "Dumping \"${dbname}\" database"
 
 if mysqldump -h"${dbhost}" -u"${dbuser}" -p"${dbpass}" \
     --flush-logs \
@@ -90,10 +90,12 @@ if mysqldump -h"${dbhost}" -u"${dbuser}" -p"${dbpass}" \
     --create-options \
     "${dbname}" | gzip > "${bkpdir}/${TIME}_${bkpname}.sql.gz";then
 
-    log_write "DB dump complete"
+    DUMPSTATUS=0
+    log_write "DB dump complete. File \"${bkpdir}/${TIME}_${bkpname}.sql.gz\""
 else
+    DUMPSTATUS=1
     log_write "## DB dump failed ##"
-    exit 4
+    exit 5
 fi
 
 
@@ -114,7 +116,7 @@ TOTALTIME=$(date -d@"$TOTALSEC" -u +%Hh%Mm%Ss)
 
 log_write "Backup file size: ${BKPBYTES}B - ${BKPMEGAS}MB"
 log_write "Backup total time: ${TOTALSEC}s - $TOTALTIME"
-log_write "Backup stats: {\"size\":${BKPBYTES},\"time\":${TOTALSEC}}"
+log_write "Backup stats: {\"dump_status\":${DUMPSTATUS},\"size\":${BKPBYTES},\"time\":${TOTALSEC}}"
 
 log_write "FINISH"
 exit 0

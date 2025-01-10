@@ -1,0 +1,122 @@
+zabbix_export:
+  version: '7.2'
+  template_groups:
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+      name: Templates/Applications
+  templates:
+    - uuid: acfb2b40b9594ce39f5d155b2d21eb33
+      template: 'Zabbix DB Backup Stats by Zabbix Agent Active'
+      name: 'Zabbix DB Backup Stats by Zabbix Agent Active'
+      description: |
+        Zabbix database backup statistics
+        
+        by diasdm
+        https://github.com/diasdmhub/zabbix_db_backup
+      vendor:
+        name: diasdm
+        version: 7.2-2
+      groups:
+        - name: Templates/Applications
+      items:
+        - uuid: c04a33c13ec2447e997aaba48e09a1f8
+          name: 'DB Backup Log Stats'
+          type: ZABBIX_ACTIVE
+          key: 'logrt["{$ZABBIX.BKP.LOG.DIR}{$ZABBIX.BKP.LOG.NAME}",">> Backup stats: (.*)",,,skip,"\1"]'
+          delay: 1h
+          history: 2d
+          value_type: LOG
+          description: 'Master item that pull the DB backup log messages'
+          logtimefmt: yyyyMMddhhmmss
+          tags:
+            - tag: Log
+              value: db_backup
+        - uuid: cf93c28e68094651b2b9c8863ac7aac1
+          name: 'DB Backup Dump Status'
+          type: DEPENDENT
+          key: 'zabbix.db.backup[dump.status]'
+          history: 7d
+          trends: '0'
+          description: |
+            DB backup dump status
+            0 - Ok
+            1 - Failed
+          valuemap:
+            name: 'DB Dump Status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.dump_status
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'logrt["{$ZABBIX.BKP.LOG.DIR}{$ZABBIX.BKP.LOG.NAME}",">> Backup stats: (.*)",,,skip,"\1"]'
+          tags:
+            - tag: Backup
+              value: status
+          triggers:
+            - uuid: 455b83aeef3f451592786e2c859ec110
+              expression: 'last(/Zabbix DB Backup Stats by Zabbix Agent Active/zabbix.db.backup[dump.status])=1'
+              name: 'Zabbix DB Backup Failed'
+              priority: WARNING
+              description: |
+                The last Zabbix DB backup has failed
+                Check the script log
+              tags:
+                - tag: Status
+                  value: failed
+        - uuid: ab69b1c2fd65493ab800b6554b4b9113
+          name: 'DB Backup File Size'
+          type: DEPENDENT
+          key: 'zabbix.db.backup[size]'
+          history: 30d
+          units: B
+          description: 'DB backup file size in Bytes'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.size
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'logrt["{$ZABBIX.BKP.LOG.DIR}{$ZABBIX.BKP.LOG.NAME}",">> Backup stats: (.*)",,,skip,"\1"]'
+          tags:
+            - tag: Backup
+              value: size
+        - uuid: 9cc1dfd3c42340c9a558bf73a1146ca6
+          name: 'DB Backup Execution Time'
+          type: DEPENDENT
+          key: 'zabbix.db.backup[time]'
+          history: 30d
+          units: s
+          description: 'DB backup execution time in seconds'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.time
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          master_item:
+            key: 'logrt["{$ZABBIX.BKP.LOG.DIR}{$ZABBIX.BKP.LOG.NAME}",">> Backup stats: (.*)",,,skip,"\1"]'
+          tags:
+            - tag: Backup
+              value: time
+      tags:
+        - tag: Zabbix
+          value: db_backup
+      macros:
+        - macro: '{$ZABBIX.BKP.LOG.DIR}'
+          description: 'Full path to the backup log directory with a / at the end'
+        - macro: '{$ZABBIX.BKP.LOG.NAME}'
+          value: zabbix_db_bkp_full.log
+          description: 'Name of the backup log file'
+      valuemaps:
+        - uuid: 447f5286afc942f9a178c0fd982426c3
+          name: 'DB Dump Status'
+          mappings:
+            - value: '0'
+              newvalue: Ok
+            - value: '1'
+              newvalue: Failed
