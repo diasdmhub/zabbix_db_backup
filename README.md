@@ -2,7 +2,7 @@
 
 <div align="right">
 
-[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./../../LICENSE) [![Script](https://img.shields.io/badge/Version-Latest-blue?logo=zotero&color=0aa8d2)](./zabbix_db_bkp_full.sh)
+[![License](https://img.shields.io/badge/License-GPL3-blue?logo=opensourceinitiative&logoColor=fff)](./LICENSE) [![Script](https://img.shields.io/badge/Version-Latest-blue?logo=zotero&color=0aa8d2)](./zabbix_db_bkp_full.sh)
 
 </div>
 
