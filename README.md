@@ -44,6 +44,13 @@ chmod +x zabbix_db_bkp_full.sh
 > ⚠️ **For this option, it is recommended to secure the script file permissions in the system (e.g. _user access only_).**
 
 ```
+#002.001 VAR TEST
+    dbhost="localhost"         # SET HERE YOUR PRE-SET DB HOSTNAME
+    dbname="zabbix"            # SET HERE YOUR PRE-SET DB NAME
+    dbuser="zabbix"            # SET HERE YOUR PRE-SET DB USERNAME
+    dbpass="zabbix"            # SET HERE YOUR PRE-SET DB USERNAME'S PASSWORD
+```
+```
 ./zabbix_db_bkp_full.sh -d
 ```
 
@@ -122,5 +129,5 @@ chmod +x zabbix_db_bkp_full.sh
 
 <BR>
 
-| [⬆️ Top](#zabbix-housekeeper-stats-template) |
+| [⬆️ Top](#zabbix-db-backup-template-and-script-for-mysql) |
 | --- |
