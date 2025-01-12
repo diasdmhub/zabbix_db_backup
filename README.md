@@ -1,4 +1,4 @@
-# Zabbix DB Backup Template and Script for MySQL
+# Zabbix MySQL DB Backup Script and Template
 
 <div align="right">
 
@@ -129,5 +129,5 @@ chmod +x zabbix_db_bkp_full.sh
 
 <BR>
 
-| [⬆️ Top](#zabbix-db-backup-template-and-script-for-mysql) |
+| [⬆️ Top](#zabbix-mysql-db-backup-script-and-template) |
 | --- |
