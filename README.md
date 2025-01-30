@@ -103,10 +103,9 @@ chmod +x zabbix_db_bkp_full.sh
 
 ## MACROS
 
-| Macro                  | Default Value          | Description |
-| :--------------------- | :--------------------: | :---------- |
-| {$ZABBIX.BKP.LOG.DIR}  |                        | Full path to the backup log directory with a `/` at the end |
-| {$ZABBIX.BKP.LOG.NAME} | zabbix_db_bkp_full.log | Name of the backup log file |
+| Macro                    | Default Value                       | Description |
+| :----------------------- | :---------------------------------: | :---------- |
+| `{$ZABBIX.BKP.LOG.DIR}`  | `/var/log/zabbix/zabbix_server.log` | Full path to the backup log file. The same as in the `LogFile` Zabbix Server configuration parameter. |
 
 <BR>
 
