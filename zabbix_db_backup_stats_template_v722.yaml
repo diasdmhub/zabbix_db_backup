@@ -21,7 +21,7 @@ zabbix_export:
         - uuid: c04a33c13ec2447e997aaba48e09a1f8
           name: 'DB Backup Log Stats'
           type: ZABBIX_ACTIVE
-          key: 'logrt["{$ZABBIX.BKP.LOG.DIR}{$ZABBIX.BKP.LOG.NAME}",">> Backup stats: (.*)",,,skip,"\1"]'
+          key: 'logrt["{$ZABBIX.BKP.LOG.PATH}",">> Backup stats: (.*)",,,skip,"\1"]'
           delay: 1h
           history: '0'
           value_type: LOG
@@ -50,7 +50,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'logrt["{$ZABBIX.BKP.LOG.DIR}{$ZABBIX.BKP.LOG.NAME}",">> Backup stats: (.*)",,,skip,"\1"]'
+            key: 'logrt["{$ZABBIX.BKP.LOG.PATH}",">> Backup stats: (.*)",,,skip,"\1"]'
           tags:
             - tag: Backup
               value: status
@@ -78,7 +78,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'logrt["{$ZABBIX.BKP.LOG.DIR}{$ZABBIX.BKP.LOG.NAME}",">> Backup stats: (.*)",,,skip,"\1"]'
+            key: 'logrt["{$ZABBIX.BKP.LOG.PATH}",">> Backup stats: (.*)",,,skip,"\1"]'
           tags:
             - tag: Backup
               value: size
@@ -97,7 +97,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'logrt["{$ZABBIX.BKP.LOG.DIR}{$ZABBIX.BKP.LOG.NAME}",">> Backup stats: (.*)",,,skip,"\1"]'
+            key: 'logrt["{$ZABBIX.BKP.LOG.PATH}",">> Backup stats: (.*)",,,skip,"\1"]'
           tags:
             - tag: Backup
               value: time
@@ -105,11 +105,9 @@ zabbix_export:
         - tag: Zabbix
           value: db_backup
       macros:
-        - macro: '{$ZABBIX.BKP.LOG.DIR}'
-          description: 'Full path to the backup log directory with a / at the end'
-        - macro: '{$ZABBIX.BKP.LOG.NAME}'
-          value: zabbix_db_bkp_full.log
-          description: 'Name of the backup log file'
+        - macro: '{$ZABBIX.BKP.LOG.PATH}'
+          value: /var/log/zabbix/zabbix_server.log
+          description: 'Full path to the backup log file. The same as in the LogFile Zabbix Server configuration parameter.'
       valuemaps:
         - uuid: 447f5286afc942f9a178c0fd982426c3
           name: 'DB Dump Status'
