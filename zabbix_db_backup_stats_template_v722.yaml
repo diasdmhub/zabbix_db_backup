@@ -106,7 +106,6 @@ zabbix_export:
           value: db_backup
       macros:
         - macro: '{$ZABBIX.BKP.LOG.PATH}'
-          value:
           description: 'Full path to the backup log file'
       valuemaps:
         - uuid: 447f5286afc942f9a178c0fd982426c3
