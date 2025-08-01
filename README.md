@@ -26,8 +26,21 @@ The template is ready to read the script log statistics with a Zabbix Agent in a
 - [`gzip`](https://www.gnu.org/software/gzip/)
 - A MySQL [backup user](https://www.zabbix.com/documentation/current/en/manual/appendix/install/db_scripts) for Zabbix database dump
 
-> - **If required, add the `RELOAD` and `PROCESS` database privileges to the backup user. For example:**
-> _`GRANT RELOAD, PROCESS ON . TO 'backup_user'@'localhost'; FLUSH PRIVILEGES;`_
+> **If required, add the `RELOAD` and `PROCESS` database privileges to the backup user. For example:**
+>
+> ```sql
+> GRANT RELOAD, PROCESS ON *.* TO 'backup_user'@'localhost';
+> FLUSH PRIVILEGES;
+> ```
+>
+> **or**
+>
+> ```sql
+> GRANT SELECT, SHOW VIEW, LOCK TABLES, SHOW DATABASES, PROCESS, RELOAD, EVENT, TRIGGER
+> ON `zabbixDB`.* TO 'backup_user'@'localhost';
+> FLUSH PRIVILEGES;
+> ```
+
 
 <BR>
 
