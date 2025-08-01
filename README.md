@@ -94,7 +94,7 @@ chmod +x zabbix_db_bkp_full.sh
 20250110173529 >> START
 20250110173529 >> Dumping "zabbix" database
 20250110173857 >> DB dump complete
-20250110173857 >> Backup file: "/home/dan/zabbix_db_bkp/20250110173529_zabbix_db_bkp_full.sql.gz"
+20250110173857 >> Backup file: "/home/user/zabbix_db_bkp/20250110173529_zabbix_db_bkp_full.sql.gz"
 20250110173857 >> Excluding old backup with more than 30 days
 20250110173857 >> Backup file size: 322082821B - 307MB
 20250110173857 >> Backup total time: 208s - 00h03m28s
