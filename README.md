@@ -26,21 +26,29 @@ The template is ready to read the script log statistics with a Zabbix Agent in a
 - [`gzip`](https://www.gnu.org/software/gzip/)
 - A MySQL [backup user](https://www.zabbix.com/documentation/current/en/manual/appendix/install/db_scripts) for Zabbix database dump
 
-> **If required, add the `RELOAD` and `PROCESS` database privileges to the backup user. For example:**
->
-> ```sql
-> GRANT RELOAD, PROCESS ON *.* TO 'backup_user'@'localhost';
-> FLUSH PRIVILEGES;
-> ```
->
-> **or**
->
-> ```sql
-> GRANT SELECT, SHOW VIEW, LOCK TABLES, SHOW DATABASES, PROCESS, RELOAD, EVENT, TRIGGER
-> ON `zabbixDB`.* TO 'backup_user'@'localhost';
-> FLUSH PRIVILEGES;
-> ```
+    > **If required, add the `RELOAD` and `PROCESS` database privileges to the backup user. For example:**
+    >
+    > ```sql
+    > GRANT RELOAD, PROCESS ON *.* TO 'backup_user'@'localhost';
+    > FLUSH PRIVILEGES;
+    > ```
+    >
+    > **or**
+    >
+    > ```sql
+    > GRANT SELECT, SHOW VIEW, LOCK TABLES, SHOW DATABASES, PROCESS, RELOAD, EVENT, TRIGGER
+    > ON `zabbixDB`.* TO 'backup_user'@'localhost';
+    > FLUSH PRIVILEGES;
+    > ```
 
+- When setting the template, the `zabbix` user needs `execute` permission in the directory where the backup log is saved, as well as in the parent directories. Also, the Zabbix user must be able to read the log file. This allows the Zabbix Agent to read the log file. The command `chmod` can be used to modify directory and file permissions, but it is good practice to restrict access to authorized users only. A common ACL permission can be granted to the file and directory. For example:
+
+    ```bash
+    setfacl -m u:zabbix:--x /home/user_dir
+    setfacl -m u:zabbix:--x /home/user_dir/zabbix_db_bkp
+    setfacl -m u:zabbix:--x /home/user_dir/zabbix_db_bkp/log
+    setfacl -m u:zabbix:r-- /home/user_dir/zabbix_db_bkp/log/zabbix_db_bkp_full.log
+    ```
 
 <BR>
 
