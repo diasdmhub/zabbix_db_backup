@@ -10,7 +10,7 @@
 
 ## OVERVIEW
 
-This is a script that creates a full backup of the Zabbix database. It is useful to automate Zabbix DB backups with a _crontab_ or some other tool like Zabbix itself, and keep the backups consistent. Along with it, a useful template that pulls the script log data into Zabbix.
+This is a script that creates a backup of the Zabbix database. It is useful to automate Zabbix DB backups with a _crontab_ or some other tool like Zabbix itself, and keep the backups consistent. Along with it, a useful template that pulls the script log data into Zabbix.
 
 The script uses `mysqldump` to produce a set of SQL statements from the Zabbix MySQL database for backup purposes. It also reduces the size of the database dump by compressing it with `gzip`. During this process, the script records the execution to a log file and writes some statistics.
 
