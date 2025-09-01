@@ -10,7 +10,7 @@
 
 ## OVERVIEW
 
-This is a script that creates a full backup of the Zabbix database. It is useful to automate Zabbix DB backups with a _crontab_ or some other tool like Zabbix itself, and keep the backups consistent. Along with it, a useful template that pulls the script log data into Zabbix.
+This is a script that creates a backup of the Zabbix database. It is useful to automate Zabbix DB backups with a _crontab_ or some other tool like Zabbix itself, and keep the backups consistent. Along with it, a useful template that pulls the script log data into Zabbix.
 
 The script uses `mysqldump` to produce a set of SQL statements from the Zabbix MySQL database for backup purposes. It also reduces the size of the database dump by compressing it with `gzip`. During this process, the script records the execution to a log file and writes some statistics.
 
@@ -57,7 +57,9 @@ The template is ready to read the script log statistics with a Zabbix Agent in a
 **1.** Add execute permission to the script file after downloading it to the Zabbix server.
 
 ```
-chmod +x zabbix_db_bkp_full.sh
+chmod ug+x zabbix_db_bkp_full.sh
+# OR
+chmod ug+x zabbix_db_bkp_no_hist.sh
 ```
 
 **2.1** **[`OPTION 1`]** To use a pre-set Zabbix DB authentication, set the authentication values inside the script at step `#002.001` and pass the `-d` argument when executing it.
@@ -71,8 +73,11 @@ chmod +x zabbix_db_bkp_full.sh
     dbuser="zabbix"            # SET HERE YOUR PRE-SET DB USERNAME
     dbpass="zabbix"            # SET HERE YOUR PRE-SET DB USERNAME'S PASSWORD
 ```
+
 ```
 ./zabbix_db_bkp_full.sh -d
+# OR
+./zabbix_db_bkp_no_hist.sh -d
 ```
 
 ---
@@ -83,6 +88,8 @@ chmod +x zabbix_db_bkp_full.sh
 
 ```
 ./zabbix_db_bkp_full.sh "[dbhost]" "[dbname]" "[dbuser]" "[dbpass]"
+# OR
+./zabbix_db_bkp_no_hist.sh "[dbhost]" "[dbname]" "[dbuser]" "[dbpass]"
 ```
 
 <BR>
@@ -91,7 +98,7 @@ chmod +x zabbix_db_bkp_full.sh
 
 - The default backup directory is set to the user's home directory (`$HOME`) and is named `zabbix_db_bkp`. This can be changed in step `#002` by changing the `bkpdir` variable.
 - The log file resides in the backup file directory within the `log` subdirectory.
-- The default backup filename is set to `zabbix_db_bkp_full`. A timestamp prefix is appended to the file in the `yyyyMMddhhmmss` format followed by the `.sql.gz` file extension. For example `20250109040001_zabbix_db_bkp_full.sql.gz`.
+- The default backup filename is set to `zabbix_db_bkp_full` or `zabbix_db_bkp_no_hist`. A timestamp prefix is appended to the file in the `yyyyMMddhhmmss` format followed by the `.sql.gz` file extension. For example `20250109040001_zabbix_db_bkp_full.sql.gz`.
 - By default, the script only keeps **`30`** days of backup files and deletes any backups older than that. This can be changed in step `#002` by modifying the `bkpdays` variable.
 - The script output is written both to the console and to the log file.
 
@@ -113,7 +120,8 @@ chmod +x zabbix_db_bkp_full.sh
 <BR>
 
 ---
-### ➡️ [Download Script](./zabbix_db_bkp_full.sh)
+### ➡️ [Download Full Backup Script](./zabbix_db_bkp_full.sh)
+### ➡️ [Download No History Backup Script](./zabbix_db_bkp_no_hist.sh)
 ---
 ### ➡️ [Download Template](./zabbix_db_backup_stats_template_v722.yaml)
 ---
@@ -121,6 +129,8 @@ chmod +x zabbix_db_bkp_full.sh
 ---
 
 <BR>
+
+## Template `Zabbix DB Backup Stats by Zabbix Agent Active`
 
 ## MACROS
 
