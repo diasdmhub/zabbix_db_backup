@@ -2,8 +2,9 @@
 
 # ZABBIX DATABASE FULL BACKUP
 # Author: diasdm
-# This script creates a full backup of the Zabbix database using mysqldump,
-# compresses it with gzip, and logs the process.
+# This script creates a backup of the Zabbix database using mysqldump,
+# while ignoring history, trend and audit tables, compresses it with gzip,
+# and logs the process.
 
 # REQUIREMENTS:
 #     - mysqldump
@@ -12,11 +13,11 @@
 # USAGE:
 #     To use a pre-set Zabbix DB authentication,
 #     set values below (#002.001) and pass the "-d" argument.
-#         ./zabbix_db_bkp_full.sh -d
+#         ./zabbix_db_bkp_no_hist.sh -d
 
 #     To use your Zabbix DB authentication as arguments,
 #     pass all arguments in the order below.
-#         ./zabbix_db_bkp_full.sh "[dbhost]" "[dbname]" "[dbuser]" "[dbpass]"
+#         ./zabbix_db_bkp_no_hist.sh "[dbhost]" "[dbname]" "[dbuser]" "[dbpass]"
 #     PS: THE DUMP MAY FAIL IF ANY ARGUMENT IS OUT OF ORDER
 
 
@@ -33,7 +34,7 @@ fi
 #002 VAR
 bkpdir=${HOME}/zabbix_db_bkp   # BACKUP LOCAL DIR
 bkplogdir=${bkpdir}/log        # BACKUP LOG DIR
-bkpname=zabbix_db_bkp_full     # BACKUP FILE NAME
+bkpname=zabbix_db_bkp_no_hist  # BACKUP FILE NAME
 bkpdays=30                     # NUMBER OF DAYS TO KEEP OLD BACKUP
 
 TIME=$(date +%Y%m%d%H%M%S)     # BACKUP FILE TIMESTAMP
