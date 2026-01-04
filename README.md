@@ -29,15 +29,15 @@ The template is ready to read the script log statistics with a Zabbix Agent in a
     > **If required, add the `RELOAD` and `PROCESS` database privileges to the backup user. For example:**
     >
     > ```sql
-    > GRANT RELOAD, PROCESS ON *.* TO 'backup_user'@'localhost';
+    > GRANT SHOW DATABASES, RELOAD, PROCESS ON *.* TO 'backup_user'@'localhost';
     > FLUSH PRIVILEGES;
     > ```
     >
     > **or**
     >
     > ```sql
-    > GRANT SELECT, SHOW VIEW, LOCK TABLES, SHOW DATABASES, PROCESS, RELOAD, EVENT, TRIGGER
-    > ON `zabbixDB`.* TO 'backup_user'@'localhost';
+    > GRANT SELECT, SHOW VIEW, LOCK TABLES, EVENT, TRIGGER ON `zabbixDB`.* TO 'backup_user'@'localhost';
+    > GRANT SHOW DATABASES, PROCESS, RELOAD ON *.* TO 'backup_user'@'localhost';
     > FLUSH PRIVILEGES;
     > ```
 
